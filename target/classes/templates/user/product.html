@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore - Sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ========================================= */
+        /* CSS CHUNG & SẢN PHẨM */
+        /* ========================================= */
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        /* Bổ sung CSS cho dropdown trong navbar */
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: none;
+        }
+        .dropdown-item {
+            transition: all 0.2s ease;
+        }
+        .dropdown-item:hover {
+            background-color: #f0f2f5;
+            color: #667eea;
+        }
+
+        .btn-auth {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            margin: 0 5px;
+            border-radius: 8px;
+            padding: 5px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-auth:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .cart-icon {
+            position: relative;
+            color: white;
+            font-size: 1.2rem;
+            margin-left: 15px;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Banner trang sản phẩm */
+        .product-banner {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/images/banners/banner_home3.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+
+            padding: 60px 0;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .product-banner h1 {
+            color: white;
+            font-weight: bold;
+        }
+
+        .product-banner p.lead {
+             color: rgba(255, 255, 255, 0.9);
+        }
+
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .category-section {
+            margin: 40px 0;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        /* Product Card Styles */
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            height: 250px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #e67e22;
+        }
+
+        .product-image img {
+            height: 100%;
+            width: 100%;
+            object-fit: contain;
+            padding: 10px;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .product-title:hover {
+            color: #667eea;
+        }
+
+        .desc-sold-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            min-height: 20px;
+        }
+
+        .product-description {
+            flex-grow: 1;
+            margin-bottom: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding-right: 5px;
+        }
+
+        .price-rating-row {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .product-price {
+            color: #e74c3c;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #95a5a6;
+            font-size: 0.9rem;
+            margin-right: 15px;
+            font-weight: normal;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+
+
+        .btn-add-cart {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.4);
+        }
+
+        .btn-order {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px 0 20px 0;
+            margin-top: 60px;
+        }
+
+        .footer-brand-link {
+            text-decoration: none;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+        .footer-brand-link:hover {
+            color: white;
+            opacity: 0.8;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        /* ========================================= */
+        /* CSS CHATBOT */
+        /* ========================================= */
+        .chatbox-wrapper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        #chat-toggle-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #chat-toggle-btn:hover {
+            background-color: #764ba2;
+        }
+
+        #chatbox-content {
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            margin-bottom: 10px;
+            overflow: hidden;
+            display: none; /* Mặc định ẩn, JS sẽ bật */
+            flex-direction: column;
+        }
+
+        .chatbox-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-header h5 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        #clear-history-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #clear-history-btn:hover {
+            color: white;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+
+        .chatbox-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #e9ecef;
+            background-color: white;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        #chat-send {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #chat-send:hover {
+            background-color: #764ba2;
+        }
+    </style>
+</head>
+<body id="page-top">
+
+<div class="chatbox-wrapper">
+    <div id="chatbox-content">
+        <div class="chatbox-header">
+            <h5><i class="fas fa-robot"></i> Chat Hỗ Trợ</h5>
+            <button id="clear-history-btn" title="Xóa lịch sử chat"><i class="fas fa-trash-alt"></i></button>
+        </div>
+        <div id="chat-messages">
+        </div>
+        <div class="chatbox-input-area">
+            <input type="text" id="chat-input" placeholder="Gõ tin nhắn của bạn...">
+            <button id="chat-send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <button id="chat-toggle-btn">💬</button>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}"><i class="fas fa-book-open"></i> BookStore</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-3">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/products}">Sản phẩm</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCategories" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Danh mục
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownCategories">
+                        <li th:each="category : ${allCategories}">
+                            <a class="dropdown-item"
+                               th:href="@{/products(categoryId=${category.id_categories},_fragment='products')}"
+                               th:text="${category.name}">
+                                Tên Danh Mục
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}">Giới thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contact}">Liên hệ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/voucher}">Voucher</a>
+                </li>
+            </ul>
+
+            <form th:action="@{/products}" method="GET" class="d-flex mx-auto my-2 my-lg-0" style="width: 100%; max-width: 300px;">
+                <div class="input-group">
+                    <input type="text" class="form-control border-0"
+                           name="keyword"
+                           th:value="${param.keyword}"
+                           placeholder="Tìm tên sách, tác giả..."
+                           style="border-radius: 20px 0 0 20px; font-size: 0.9rem;">
+                    <button class="btn btn-light border-0" type="submit"
+                            style="border-radius: 0 20px 20px 0; color: #667eea;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="d-flex align-items-center ms-lg-3">
+                <div th:if="${!isLoggedIn}">
+                    <a th:href="@{/login}" class="btn btn-auth btn-sm text-nowrap">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+                    <a th:href="@{/user/register}" class="btn btn-auth btn-sm text-nowrap">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                    </a>
+                </div>
+
+                <div th:if="${isLoggedIn}" class="dropdown">
+                    <button class="btn btn-auth btn-sm dropdown-toggle text-nowrap" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i>
+                        <span th:text="${currentUser.username}">Tài khoản</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                        <li><a class="dropdown-item" th:href="@{/user/profile}">
+                            <i class="fas fa-info-circle"></i> Thông tin cá nhân
+                        </a></li>
+
+                        <li><a class="dropdown-item" th:href="@{/my-orders}">
+                            <i class="fas fa-history"></i> Đơn hàng của tôi
+                        </a></li>
+
+                        <li><a class="dropdown-item" th:href="@{/user/address_setup.html}">
+                            <i class="fas fa-map-marked-alt"></i> Cập nhật Địa chỉ
+                        </a></li>
+
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" th:href="@{/logout}">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a></li>
+                    </ul>
+                </div>
+
+                <a th:href="@{/user/cart}" class="cart-icon ms-3" style="cursor: pointer;">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="product-banner">
+    <div class="container">
+        <h1 th:text="${pageTitle}">Tất cả sản phẩm của BookStore</h1>
+        <p class="lead">Cung cấp sách giáo khoa, tham khảo và tài liệu học tập chất lượng cao.</p>
+    </div>
+</section>
+
+<div class="container" id="products">
+    <h2 class="text-center mb-5">Danh sách sản phẩm</h2>
+    <div class="row" id="productList">
+        <div th:if="${products.isEmpty()}" class="col-12 text-center">
+            <div class="alert alert-info">
+                <strong>Thông báo:</strong> Không tìm thấy sản phẩm nào.
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <a href="#page-top" class="footer-brand-link">
+                    <h5><i class="fas fa-book-open"></i> BookStore</h5>
+                </a>
+                <p>Cửa hàng sách học tập hàng đầu cho học sinh cấp 3</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Liên hệ</h5>
+                <p><i class="fas fa-phone"></i> 0123 456 789</p>
+                <p><i class="fas fa-envelope"></i> info@bookstore.vn</p>
+                <p><i class="fas fa-map-marker-alt"></i> 298 Đ. Cầu Diên, Minh Khai, Bắc Từ Liêm, Hà Nội</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Theo dõi chúng tôi</h5>
+                <div class="d-flex">
+                    <a href="https://www.facebook.com" target="_blank" class="text-white me-3"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.instagram.com" target="_blank" class="text-white me-3"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank" class="text-white"><i class="fab fa-youtube fa-2x"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="text-center">
+            <p>&copy; 2024 BookStore. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </div>
+</footer>
+
+<div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-shopping-cart"></i> Giỏ hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cartItems">
+                    <p class="text-center text-muted">Giỏ hàng trống</p>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <h5>Tổng cộng: <span id="totalPrice">0đ</span></h5>
+                    <a th:href="@{/user/cart}" class="btn btn-primary-custom">
+                        <i class="fas fa-credit-card"></i> Thanh toán
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const products = /*[[${products}]]*/ [];
+
+    let cart = JSON.parse(localStorage.getItem('bookstoreCart') || '[]');
+
+    // Load products on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        displayProducts(products);
+        updateCartUI();
+
+        // CƠ CHẾ SCROLL BỔ SUNG
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('keyword') || urlParams.has('categoryId') || window.location.hash === '#products') {
+            document.getElementById('products').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // JavaScript cho link cuộn mượt #page-top
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                // Chỉ xử lý nếu link là #page-top
+                if (this.getAttribute('href') === '#page-top') {
+                    e.preventDefault();
+                    document.body.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+
+    function filterByCategory(categoryId) {
+        window.location.href = `/products?categoryId=${categoryId}#products`;
+    }
+
+    function displayProducts(productsToShow) {
+        const productList = document.getElementById('productList');
+        productList.innerHTML = '';
+
+        if (!productsToShow || productsToShow.length === 0) {
+             productList.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="alert alert-info">
+                        <strong>Thông báo:</strong> Không tìm thấy sản phẩm nào phù hợp.
+                    </div>
+                </div>`;
+            return;
+        }
+
+        const defaultIcon = '📚';
+
+        productsToShow.forEach(product => {
+            const detailUrl = `/product_detail/${product.idProducts}`;
+            const firstImageLink = product.imageLinks && product.imageLinks.length > 0 ? product.imageLinks[0] : null;
+
+            const originalPrice = product.price || 0;
+            const discountPercentage = product.discount || 0;
+
+            let calculatedDiscountedPrice = product.discountedPrice;
+            if (calculatedDiscountedPrice === undefined || calculatedDiscountedPrice === null) {
+                 calculatedDiscountedPrice = originalPrice - (originalPrice * discountPercentage / 100);
+            }
+
+            const finalPriceToDisplay = calculatedDiscountedPrice;
+            const hasDiscount = originalPrice > finalPriceToDisplay;
+
+            const rating = product.averageRating || 0;
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+            let ratingStarsHtml = '';
+            for (let i = 0; i < fullStars; i++) {
+                ratingStarsHtml += '<i class="fas fa-star"></i>';
+            }
+            if (halfStar) {
+                ratingStarsHtml += '<i class="fas fa-star-half-alt"></i>';
+            }
+            for (let i = 0; i < emptyStars; i++) {
+                ratingStarsHtml += '<i class="far fa-star"></i>';
+            }
+
+            const authorName = product.author || 'Đang cập nhật...';
+
+            const imageContent = firstImageLink
+                ? `<img src="${firstImageLink}" alt="${product.title}">`
+                : `<div class="text-center" style="font-size: 4rem;">${defaultIcon}</div>`;
+
+
+            const productCard = `
+                    <div class="col-lg-4 col-md-6">
+                        <div class="product-card" onclick="window.location.href='${detailUrl}'">
+                            <div class="product-image">
+                                ${imageContent}
+                            </div>
+                            <div class="product-info">
+                                <h5 class="product-title">${product.title}</h5>
+
+                                <div class="desc-sold-row">
+                                    <p class="text-muted product-description">Tác giả: ${authorName}</p>
+                                    <small class="text-muted text-nowrap">Đã bán: ${product.soldCount || 0}</small>
+                                </div>
+
+                                <div class="price-rating-row">
+                                    <div class="product-price">${formatPrice(finalPriceToDisplay)}</div>
+                                    ${hasDiscount ? `<div class="old-price">${formatPrice(originalPrice)}</div>` : ''}
+                                    <div class="rating-stars">
+                                        ${ratingStarsHtml}
+                                        <span style="color: #2c3e50; font-size: 0.9rem; margin-left: 5px;">(${rating.toFixed(1)})</span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex" onclick="event.stopPropagation()">
+                                    <button class="btn btn-add-cart" onclick="addToCart(${product.idProducts})">
+                                        <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                                    </button>
+                                    <button class="btn btn-order" onclick="orderNow(${product.idProducts})">
+                                        <i class="fas fa-shopping-bag"></i> Đặt hàng
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            productList.innerHTML += productCard;
+        });
+    }
+
+    function formatPrice(price) {
+        if (price === null || typeof price === 'undefined') {
+            return 'Đang cập nhật';
+        }
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+
+    function addToCart(productId) {
+        const product = products.find(p => p.idProducts === productId);
+        if (!product) {
+            showNotification('Lỗi: Không tìm thấy sản phẩm!', 'error');
+            return;
+        }
+
+        // --- LOGIC KIỂM TRA TỒN KHO ---
+        if (product.stockQuantity <= 0) {
+            showNotification('Sản phẩm này đã Hết hàng!', 'error');
+            return; // Chặn không cho thêm
+        }
+        // ------------------------------
+
+        const originalPrice = product.price || 0;
+        const discountPercentage = product.discount || 0;
+        let finalPrice = product.discountedPrice;
+
+        if (finalPrice === undefined || finalPrice === null) {
+             finalPrice = originalPrice - (originalPrice * discountPercentage / 100);
+        }
+
+        const existingItem = cart.find(item => item.idProducts === productId);
+        if (existingItem) {
+            existingItem.quantity += 1;
+            existingItem.price = finalPrice;
+        } else {
+            cart.push({
+                ...product,
+                idProducts: productId,
+                quantity: 1,
+                price: finalPrice
+            });
+        }
+        localStorage.setItem('bookstoreCart', JSON.stringify(cart));
+        updateCartUI();
+        showNotification('Đã thêm vào giỏ hàng!', 'success');
+    }
+
+    function orderNow(productId) {
+        const product = products.find(p => p.idProducts === productId);
+
+        // --- LOGIC KIỂM TRA TỒN KHO ---
+        if (product && product.stockQuantity <= 0) {
+            showNotification('Sản phẩm này đã Hết hàng, không thể đặt mua!', 'error');
+            return; // Chặn không cho mua
+        }
+        // ------------------------------
+
+        addToCart(productId);
+        const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+        updateCartModal();
+        cartModal.show();
+    }
+
+    function updateCartUI() {
+        const cartCount = document.getElementById('cartCount');
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalItems;
+        updateCartModal();
+    }
+
+    function updateCartModal() {
+        const cartItems = document.getElementById('cartItems');
+        const totalPrice = document.getElementById('totalPrice');
+
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<p class="text-center text-muted">Giỏ hàng trống</p>';
+            totalPrice.textContent = '0đ';
+            return;
+        }
+
+        let cartHTML = '';
+        let total = 0;
+
+        cart.forEach(item => {
+            const itemPrice = item.price || 0;
+            const itemTotal = itemPrice * item.quantity;
+            total += itemTotal;
+
+            cartHTML += `
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <div>
+                            <h6 class="mb-0">${item.title}</h6>
+                            <small class="text-danger fw-bold">${formatPrice(itemPrice)}</small>
+                             x ${item.quantity}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary me-2" onclick="updateQuantity(${item.idProducts}, -1)">-</button>
+                            <span class="mx-2">${item.quantity}</span>
+                            <button class="btn btn-sm btn-outline-secondary me-2" onclick="updateQuantity(${item.idProducts}, 1)">+</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.idProducts})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+        });
+
+        cartItems.innerHTML = cartHTML;
+        totalPrice.textContent = formatPrice(total);
+    }
+
+    function updateQuantity(productId, change) {
+        const item = cart.find(item => item.idProducts === productId);
+        if (item) {
+            item.quantity += change;
+            if (item.quantity <= 0) {
+                removeFromCart(productId);
+            } else {
+                localStorage.setItem('bookstoreCart', JSON.stringify(cart));
+                updateCartUI();
+                updateCartModal();
+            }
+        }
+    }
+
+    function removeFromCart(productId) {
+        cart = cart.filter(item => item.idProducts !== productId);
+        localStorage.setItem('bookstoreCart', JSON.stringify(cart));
+        updateCartUI();
+        updateCartModal();
+        showNotification('Đã xóa khỏi giỏ hàng!', 'info');
+    }
+
+    function checkout() {
+        if (cart.length === 0) {
+            showNotification('Giỏ hàng trống!', 'warning');
+            return;
+        }
+        window.location.href = '/user/cart';
+    }
+
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        const alertClass = type === 'success' ? 'alert-success' :
+            type === 'warning' ? 'alert-warning' :
+                type === 'error' ? 'alert-danger' : 'alert-info';
+        notification.className = `alert ${alertClass} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 3000);
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- KHAI BÁO BIẾN ---
+        const chatToggleBtn = document.getElementById("chat-toggle-btn");
+        const chatBoxContent = document.getElementById("chatbox-content");
+        const chatInput = document.getElementById("chat-input");
+        const chatMessages = document.getElementById("chat-messages");
+        const chatSend = document.getElementById("chat-send");
+        const clearHistoryBtn = document.getElementById("clear-history-btn");
+        const CHAT_API_URL = "/chat";
+
+        // Key để lưu trong LocalStorage
+        const STORAGE_KEY_HISTORY = 'bookhub_chat_history';
+        const STORAGE_KEY_STATE = 'bookhub_chat_open';
+
+        // --- 1. KHỞI TẠO (LOAD LẠI LỊCH SỬ & TRẠNG THÁI CŨ) ---
+
+        // Load trạng thái mở/đóng
+        const isOpen = localStorage.getItem(STORAGE_KEY_STATE) === 'true';
+        if (isOpen) {
+            chatBoxContent.style.display = 'flex';
+            chatToggleBtn.textContent = '❌';
+        } else {
+            chatBoxContent.style.display = 'none';
+            chatToggleBtn.textContent = '💬';
+        }
+
+        // Load lịch sử tin nhắn
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
+        history.forEach(msg => {
+            appendMessageToUI(msg.sender, msg.text, msg.type);
+        });
+
+        // --- 2. CÁC SỰ KIỆN (EVENT LISTENERS) ---
+
+        // Bật/Tắt chat
+        chatToggleBtn.addEventListener("click", () => {
+            const isHidden = chatBoxContent.style.display === 'none';
+            chatBoxContent.style.display = isHidden ? 'flex' : 'none';
+            chatToggleBtn.textContent = isHidden ? '❌' : '💬';
+
+            // Lưu trạng thái vào Storage
+            localStorage.setItem(STORAGE_KEY_STATE, isHidden);
+
+            if(isHidden) chatInput.focus();
+        });
+
+        // Xóa lịch sử
+        clearHistoryBtn.addEventListener("click", () => {
+            if(confirm("Bạn có chắc muốn xóa toàn bộ lịch sử chat?")) {
+                localStorage.removeItem(STORAGE_KEY_HISTORY);
+                chatMessages.innerHTML = ''; // Xóa giao diện
+            }
+        });
+
+        chatSend.addEventListener("click", sendMessage);
+        chatInput.addEventListener("keypress", e => { if(e.key === "Enter") sendMessage(); });
+
+        // --- 3. HÀM XỬ LÝ CHÍNH ---
+
+        function sendMessage() {
+            const msg = chatInput.value.trim();
+            if(!msg) return;
+
+            // 1. Hiển thị & Lưu tin nhắn User
+            appendMessageToUI("You", msg, 'user');
+            saveMessageToStorage("You", msg, 'user');
+
+            chatInput.value = "";
+
+            // 2. Hiển thị Typing (Không lưu cái này vào storage)
+            const typingIndicator = appendMessageToUI("Bot", "Đang trả lời...", 'typing');
+
+            // 3. Gọi API
+            fetch(CHAT_API_URL, {
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body: JSON.stringify({ message: msg })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // Xóa typing
+                if(typingIndicator && typingIndicator.parentNode) {
+                    chatMessages.removeChild(typingIndicator);
+                }
+
+                const replyText = data.reply || data.error;
+                const type = data.error ? "error" : "bot";
+
+                // 4. Hiển thị & Lưu tin nhắn Bot
+                appendMessageToUI(data.error ? "Error" : "Bot", replyText, type);
+                saveMessageToStorage(data.error ? "Error" : "Bot", replyText, type);
+            })
+            .catch(err => {
+                if(typingIndicator && typingIndicator.parentNode) {
+                    chatMessages.removeChild(typingIndicator);
+                }
+                appendMessageToUI("Error", "Lỗi kết nối server.", "error");
+            });
+        }
+
+        // Hàm chỉ để lưu vào LocalStorage
+        function saveMessageToStorage(sender, text, type) {
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
+            history.push({ sender: sender, text: text, type: type });
+            localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+        }
+
+        // Hàm chỉ để hiển thị ra màn hình (Render)
+        function appendMessageToUI(sender, text, type){
+            const div = document.createElement("div");
+
+            // CSS chung
+            div.style.maxWidth = "80%";
+            div.style.padding = "8px 12px";
+            div.style.borderRadius = "15px";
+            div.style.fontSize = "14px";
+            div.style.lineHeight = "1.5";
+            div.style.wordWrap = "break-word";
+            div.style.whiteSpace = "pre-wrap";
+            div.style.marginBottom = "5px";
+
+            if (type === 'user') {
+                div.style.alignSelf = "flex-end";
+                div.style.backgroundColor = "#e5e7eb";
+                div.style.color = "#1f2937";
+                div.style.borderBottomRightRadius = "2px";
+                div.innerHTML = `<strong>Bạn:</strong> ${text}`;
+            }
+            else if (type === 'bot') {
+                div.style.alignSelf = "flex-start";
+                div.style.backgroundColor = "#dcfce7"; // Xanh lá Pastel
+                div.style.color = "#14532d";
+                div.style.border = "1px solid #bbf7d0";
+                div.style.borderBottomLeftRadius = "2px";
+                div.innerHTML = `<strong>Bot:</strong> ${text}`;
+            }
+            else if (type === 'typing') {
+                div.style.alignSelf = "flex-start";
+                div.style.fontStyle = "italic";
+                div.style.color = "#888";
+                div.style.fontSize = "12px";
+                div.innerHTML = "⏳ <i>Đang trả lời...</i>";
+            }
+            else if (type === 'error') {
+                div.style.alignSelf = "center";
+                div.style.backgroundColor = "#fee2e2";
+                div.style.color = "#dc2626";
+                div.innerHTML = `⚠️ ${text}`;
+            }
+
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return div;
+        }
+    });
+</script>
+</body>
+</html>

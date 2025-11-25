@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/JavaWeb_N1.iml" filepath="$PROJECT_DIR$/.idea/JavaWeb_N1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BookHub.iml" filepath="$PROJECT_DIR$/BookHub.iml" />
     </modules>
   </component>
 </project>
