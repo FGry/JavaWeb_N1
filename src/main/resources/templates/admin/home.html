@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sidebar-logo {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-title {
+            opacity: 0;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-right: 4px solid white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .sidebar.collapsed .menu-item {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .menu-item span {
+            display: none;
+        }
+
+        .sidebar.collapsed .menu-item i {
+            margin-right: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 25px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            color: #667eea;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .main-content.expanded {
+            margin-left: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: #6c757d;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .notification-btn:hover {
+            color: #667eea;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: #f8f9fa;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-info h6 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .user-info small {
+            color: #6c757d;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 30px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-color);
+        }
+
+        .stat-card.users { --card-color: #667eea; }
+        .stat-card.sales { --card-color: #28a745; }
+        .stat-card.revenue { --card-color: #ffc107; }
+        .stat-card.orders { --card-color: #dc3545; }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            background: var(--card-color);
+        }
+
+        .stat-info h3 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .stat-info p {
+            margin: 5px 0 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            color: #28a745;
+        }
+
+        .stat-change.negative {
+            color: #dc3545;
+        }
+
+        /* Recent Activity */
+        .activity-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            /* Thiết lập chiều cao cho khu vực biểu đồ và danh sách */
+            align-items: start;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            /* Đặt chiều cao cố định cho khu vực biểu đồ */
+            height: 450px;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            height: 450px; /* Cân bằng chiều cao với card biểu đồ */
+            overflow-y: auto;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .activity-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .view-all-btn {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            color: #764ba2;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .activity-avatar.user { background: #667eea; }
+        .activity-avatar.order { background: #28a745; }
+        .activity-avatar.product { background: #ffc107; color: #333; }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content h6 {
+            margin: 0 0 5px;
+            font-size: 0.95rem;
+            color: #2c3e50;
+        }
+
+        .activity-content small {
+            color: #6c757d;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+            flex-shrink: 0;
+        }
+
+        /* CSS cho khu vực chi tiết bên phải biểu đồ */
+        .chart-legend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #e9ecef;
+        }
+        .chart-legend-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .activity-section {
+                grid-template-columns: 1fr;
+            }
+            .chart-card, .activity-card {
+                height: auto; /* Cho phép chiều cao tự động trên màn hình nhỏ */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .dashboard-content {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Fade In Animation */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <i class="fas fa-book-open"></i>
+        </div>
+        <h2 class="sidebar-title">BookStore</h2>
+    </div>
+
+    <nav class="sidebar-menu">
+        <a th:href="@{/admin/home}" class="menu-item active">
+            <i class="fas fa-home"></i>
+            <span>Trang chủ</span>
+        </a>
+        <a th:href="@{/admin/products}" class="menu-item">
+            <i class="fas fa-box"></i>
+            <span>Quản lý sản phẩm</span>
+        </a>
+        <a th:href="@{/admin/carts}" class="menu-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Quản lý đơn hàng</span>
+        </a>
+        <a th:href="@{/admin/users}" class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>Quản lý tài khoản</span>
+        </a>
+        <a th:href="@{/admin/vouchers}" class="menu-item">
+            <i class="fas fa-ticket-alt"></i>
+            <span>Quản lý voucher</span>
+        </a>
+        <a th:href="@{/admin/comments}" class="menu-item"> <i class="fas fa-star"></i>
+            <span>Quản lý đánh giá</span>
+        </a>
+        <a th:href="@{/admin/revenue}" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Thống kê doanh thu</span>
+        </a>
+        <a th:href="@{/admin/setting}" class="menu-item">
+            <i class="fas fa-cog"></i>
+            <span>Cài đặt</span>
+        </a>
+        <a href="#" class="menu-item" onclick="confirmLogout('/logout')">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Đăng xuất</span>
+        </a>
+    </nav>
+</div>
+
+<div class="main-content" id="mainContent">
+    <header class="header">
+        <div class="header-left">
+            <button class="d-md-none btn btn-link" onclick="toggleMobileSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="header-title">Trang chủ Admin</h1>
+        </div>
+    </header>
+
+    <div class="dashboard-content fade-in">
+        <div class="stats-grid">
+            <div class="stat-card users">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3 th:text="${#numbers.formatDecimal(totalUsers, 0, 'COMMA', 0, 'POINT')}">1,234</h3>
+                        <p>Tổng người dùng</p>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12% so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card sales">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3 th:text="${#numbers.formatDecimal(totalSales, 0, 'COMMA', 0, 'POINT')}">2,847</h3>
+                        <p>Lượt bán</p>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8% so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card revenue">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3 th:text="'₫' + ${#numbers.formatDecimal(totalRevenue, 0, 'POINT', 0, 'POINT')}">₫45.2M</h3>
+                        <p>Doanh thu</p>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+15% so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card orders">
+                <div class="stat-header">
+                    <div class="stat-info">
+                        <h3 th:text="${totalOrders}">892</h3>
+                        <p>Đơn hàng mới</p>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>-3% so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-section">
+
+            <div class="chart-card">
+                <h4 class="activity-title mb-4">Biểu đồ Sản phẩm bán ra theo Danh mục</h4>
+                <div class="d-flex" style="height: 350px;">
+                    <div style="position: relative; flex-grow: 1; max-width: 60%;">
+                        <canvas id="salesByCategoryChart"></canvas>
+                    </div>
+
+                    <div id="categorySalesLegend" class="ms-4 p-2" style="width: 40%; overflow-y: auto;">
+                        <h6 class="mb-3 fw-bold text-primary border-bottom pb-2">Chi tiết lượt bán</h6>
+                        <div th:if="${#lists.isEmpty(salesByCategoryData)}">
+                            <p class="text-muted text-center mt-5">Chưa có dữ liệu bán hàng.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(salesByCategoryData)}" class="text-center">
+                    <p class="text-muted mt-5">Chưa có dữ liệu bán hàng để hiển thị.</p>
+                </div>
+            </div>
+
+
+            <div class="activity-card">
+                <div class="activity-header">
+                    <h4 class="activity-title">Sản phẩm bán chạy</h4>
+                </div>
+                <ul class="activity-list">
+                    <li th:each="product : ${topSellingProducts}" class="activity-item">
+                        <div class="activity-avatar product">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6 th:text="${product.title}">Tên sản phẩm</h6>
+                            <small th:text="'Đã bán ' + ${product.soldCount} + ' cuốn'">Chi tiết bán ra</small>
+                        </div>
+                        <div th:text="'₫' + ${#numbers.formatDecimal(product.discountedPrice, 0, 'POINT', 0, 'POINT')}" class="activity-time">Giá bán</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    // Lấy dữ liệu từ Model (Controller)
+    const salesData = [[${salesByCategoryData}]];
+    const BACKGROUND_COLORS = [
+        '#667eea', // Blue/Purple
+        '#28a745', // Green
+        '#ffc107', // Yellow
+        '#dc3545', // Red
+        '#17a2b8', // Cyan
+        '#6f42c1', // Indigo
+    ];
+    let sidebarCollapsed = false;
+
+    // Hàm format số có dấu phẩy
+    function formatNumber(num) {
+        return num ? num.toLocaleString('vi-VN') : '0';
+    }
+
+    // VẼ BIỂU ĐỒ
+    function renderChart() {
+        if (!salesData || salesData.length === 0) {
+            return;
+        }
+
+        const labels = salesData.map(item => item.categoryName);
+        const data = salesData.map(item => item.totalSold);
+        const totalSum = data.reduce((a, b) => a + b, 0);
+
+        new Chart(document.getElementById('salesByCategoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sản phẩm đã bán',
+                    data: data,
+                    backgroundColor: BACKGROUND_COLORS.slice(0, labels.length),
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // Ẩn legend mặc định
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed) {
+                                    const value = context.parsed;
+                                    const percentage = totalSum === 0 ? 0 : ((value / totalSum) * 100).toFixed(1);
+
+                                    label += formatNumber(value) + ' sản phẩm';
+                                    label += ` (${percentage}%)`; // THÊM % THỰC TẾ
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        renderLegend(salesData, totalSum);
+    }
+
+    // RENDER LEGEND BÊN PHẢI (Lấy dữ liệu từ DB)
+    function renderLegend(data, totalSum) {
+        const legendDiv = document.getElementById('categorySalesLegend');
+        if (!legendDiv) return;
+
+        // Xóa tiêu đề mặc định vì đã có trong HTML
+        let html = '<ul class="list-unstyled">';
+
+        data.forEach((item, index) => {
+            const soldCount = item.totalSold;
+            const percentage = totalSum === 0 ? 0 : ((soldCount / totalSum) * 100).toFixed(1);
+            const color = BACKGROUND_COLORS[index % BACKGROUND_COLORS.length];
+
+            html += `
+                <li class="p-2 chart-legend-item">
+                    <div style="display: flex; align-items: center;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: ${color}; margin-right: 10px; flex-shrink: 0;"></span>
+                        <strong class="text-dark">${item.categoryName}</strong>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted">Lượt bán: <strong>${formatNumber(soldCount)}</strong></small><br>
+                        <small class="fw-bold text-success">${percentage}%</small>
+                    </div>
+                </li>
+            `;
+        });
+
+        html += '</ul>';
+        legendDiv.innerHTML += html; // Sử dụng += để giữ lại tiêu đề <h6> đã render
+
+        // Cần thay đổi cách render để không làm mất tiêu đề
+        // Vì đã gộp code, tôi sẽ sửa lại để thay thế toàn bộ nội dung sau <h6>
+        let h6Content = legendDiv.querySelector('h6').outerHTML; // Lấy lại tiêu đề h6
+        legendDiv.innerHTML = h6Content + html; // Dán lại h6 và dán nội dung mới
+    }
+
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        renderChart();
+    });
+
+    function confirmLogout(logoutUrl) {
+        if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống quản trị không?")) {
+            window.location.href = logoutUrl;
+        }
+    }
+
+    // Toggle sidebar
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebarCollapsed = !sidebarCollapsed;
+
+        if (sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('expanded');
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+        }
+    }
+
+    // Toggle mobile sidebar
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('show');
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        const alertClass = type === 'success' ? 'alert-success' :
+                          type === 'error' ? 'alert-danger' :
+                          type === 'info' ? 'alert-info' : 'alert-warning';
+
+        notification.className = `alert ${alertClass} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 4000);
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('show');
+        }
+    });
+
+    // Close mobile sidebar when clicking outside
+    document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById('sidebar');
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isToggleButton = event.target.closest('.btn');
+
+        if (!isClickInsideSidebar && !isToggleButton && window.innerWidth <= 768) {
+            sidebar.classList.remove('show');
+        }
+    });
+</script>
+</body>
+</html>
