@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voucher - BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .btn-auth {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            margin: 0 5px;
+            border-radius: 8px;
+            padding: 5px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-auth:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .cart-icon {
+            position: relative;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="voucher" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><text x="10" y="15" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.1)">🎫</text></pattern></defs><rect width="100" height="100" fill="url(%23voucher)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+
+        .voucher-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .voucher-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .voucher-header {
+            padding: 25px 30px 20px;
+            position: relative;
+        }
+
+        .voucher-discount {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 15px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .voucher-discount::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #764ba2;
+        }
+
+        .discount-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .discount-type {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .voucher-code {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .code-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .voucher-info {
+            padding: 0 30px 25px;
+        }
+
+        .voucher-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .voucher-description {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .voucher-details {
+            border-top: 1px solid #e9ecef;
+            padding-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .detail-icon {
+            width: 20px;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+
+        .detail-value {
+            color: #6c757d;
+        }
+
+        .voucher-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-ending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .voucher-category {
+            position: absolute;
+            top: -10px;
+            left: 30px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .countdown-timer {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .timer-value {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .voucher-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px 0 20px 0;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            
+            .voucher-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .voucher-header {
+                padding: 20px 20px 15px;
+            }
+            
+            .voucher-info {
+                padding: 0 20px 20px;
+            }
+            
+            .filter-section {
+                padding: 20px;
+            }
+            
+            .stats-section {
+                padding: 30px 20px;
+            }
+        }
+
+         /* ========================================= */
+        /* CSS CHATBOT */
+        /* ========================================= */
+        .chatbox-wrapper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        #chat-toggle-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #chat-toggle-btn:hover {
+            background-color: #764ba2;
+        }
+
+        #chatbox-content {
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            margin-bottom: 10px;
+            overflow: hidden;
+            display: none; /* Mặc định ẩn, JS sẽ bật */
+            flex-direction: column;
+        }
+
+        .chatbox-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-header h5 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        #clear-history-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #clear-history-btn:hover {
+            color: white;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+
+        .chatbox-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #e9ecef;
+            background-color: white;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        #chat-send {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #chat-send:hover {
+            background-color: #764ba2;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="chatbox-wrapper">
+    <div id="chatbox-content">
+        <div class="chatbox-header">
+            <h5><i class="fas fa-robot"></i> Chat Hỗ Trợ</h5>
+            <button id="clear-history-btn" title="Xóa lịch sử chat"><i class="fas fa-trash-alt"></i></button>
+        </div>
+        <div id="chat-messages">
+        </div>
+        <div class="chatbox-input-area">
+            <input type="text" id="chat-input" placeholder="Gõ tin nhắn của bạn...">
+            <button id="chat-send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <button id="chat-toggle-btn">💬</button>
+</div>
+
+
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}"><i class="fas fa-book-open"></i> BookStore</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " th:href="@{/products}">Sản phẩm</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCategories" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Danh mục
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownCategories">
+                        <li th:each="category : ${allCategories}">
+                            <a class="dropdown-item"
+                               th:href="@{/products(categoryId=${category.id_categories})}"
+                               th:text="${category.name}">
+                                Tên Danh Mục
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}">Giới thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contact}">Liên hệ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/voucher}">Voucher</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center">
+                <div th:if="${!isLoggedIn}">
+                    <a th:href="@{/login}" class="btn btn-auth btn-sm">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+                    <a th:href="@{/user/register}" class="btn btn-auth btn-sm">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                    </a>
+                </div>
+
+                <div th:if="${isLoggedIn}" class="dropdown">
+                    <button class="btn btn-auth btn-sm dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i>
+                        <span th:text="${currentUser.username}">Tài khoản</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                        <li><a class="dropdown-item" th:href="@{/user/profile}">
+                            <i class="fas fa-info-circle"></i> Thông tin cá nhân
+                        </a></li>
+
+                        <li><a class="dropdown-item" th:href="@{/my-orders}">
+                            <i class="fas fa-history"></i> Đơn hàng của tôi
+                        </a></li>
+
+                        <li><a class="dropdown-item" th:href="@{/user/address_setup.html}">
+                            <i class="fas fa-map-marked-alt"></i> Cập nhật Địa chỉ
+                        </a></li>
+
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" th:href="@{/logout}">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a></li>
+                    </ul>
+                </div>
+
+                <a th:href="@{/user/cart}" class="cart-icon ms-3" style="cursor: pointer;">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="display-3 fw-bold mb-4">
+                <i class="fas fa-ticket-alt"></i> Voucher ưu đãi
+            </h1>
+            <p class="lead fs-4 mb-5">
+                Tiết kiệm hơn với các mã giảm giá hấp dẫn
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <p class="fs-5 opacity-90">
+                        Khám phá bộ sưu tập voucher đa dạng của BookStore. Từ giảm giá sách giáo khoa
+                        đến miễn phí vận chuyển, chúng tôi có ưu đãi phù hợp cho mọi nhu cầu học tập!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="stats-section">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalVouchers">0</div>
+                    <div class="stat-label">Voucher khả dụng</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number">50%</div>
+                    <div class="stat-label">Giảm giá tối đa</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number">0đ</div>
+                    <div class="stat-label">Phí vận chuyển</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Hỗ trợ sử dụng</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="filter-section">
+        <h4 class="mb-3"><i class="fas fa-filter"></i> Lọc voucher theo loại</h4>
+        <div class="d-flex flex-wrap">
+            <button class="filter-btn active" onclick="filterVouchers(event, 'all')">
+                <i class="fas fa-list"></i> Tất cả
+            </button>
+            <button class="filter-btn" onclick="filterVouchers(event, 'discount')">
+                <i class="fas fa-percentage"></i> Giảm giá
+            </button>
+            <button class="filter-btn" onclick="filterVouchers(event, 'shipping')">
+                <i class="fas fa-shipping-fast"></i> Miễn ship
+            </button>
+            <button class="filter-btn" onclick="filterVouchers(event, 'combo')">
+                <i class="fas fa-gift"></i> Combo
+            </button>
+            <button class="filter-btn" onclick="filterVouchers(event, 'newbie')">
+                <i class="fas fa-user-plus"></i> Khách mới
+            </button>
+            <button class="filter-btn" onclick="filterVouchers(event, 'vip')">
+                <i class="fas fa-crown"></i> VIP
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="voucher-grid" id="voucherGrid">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            // Khai báo biến global để chứa dữ liệu voucher từ server
+            let VOUCHERS_DATA = JSON.parse(/*[[${vouchersJson}]]*/ '[]');
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5><i class="fas fa-book-open"></i> BookStore</h5>
+                <p>Cửa hàng sách học tập hàng đầu cho học sinh cấp 3</p>
+                <div class="d-flex">
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-youtube fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h5>Liên kết nhanh</h5>
+                <ul class="list-unstyled">
+                    <li><a th:href="@{/}" class="text-white-50">Trang chủ</a></li>
+                    <li><a th:href="@{/products}" class="text-white-50">Sản phẩm</a></li>
+                    <li><a th:href="@{/about}" class="text-white-50">Giới thiệu</a></li>
+                    <li><a th:href="@{/contact}" class="text-white-50">Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Liên hệ</h5>
+                <p><i class="fas fa-phone"></i> 0123 456 789</p>
+                <p><i class="fas fa-envelope"></i> info@bookstore.vn</p>
+                <p><i class="fas fa-map-marker-alt"></i> Đại học Công nghiệp Hà Nội - Cơ sở 1</p>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="text-center">
+            <p>&copy; 2024 BookStore. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // -&#45;&#45; KHAI BÁO BIẾN -&#45;&#45;
+        const chatToggleBtn = document.getElementById("chat-toggle-btn");
+        const chatBoxContent = document.getElementById("chatbox-content");
+        const chatInput = document.getElementById("chat-input");
+        const chatMessages = document.getElementById("chat-messages");
+        const chatSend = document.getElementById("chat-send");
+        const clearHistoryBtn = document.getElementById("clear-history-btn");
+        const CHAT_API_URL = "/chat";
+
+        // Key để lưu trong LocalStorage
+        const STORAGE_KEY_HISTORY = 'bookhub_chat_history';
+        const STORAGE_KEY_STATE = 'bookhub_chat_open';
+
+        // -&#45;&#45; 1. KHỞI TẠO (LOAD LẠI LỊCH SỬ & TRẠNG THÁI CŨ) -&#45;&#45;
+
+        // Load trạng thái mở/đóng
+        const isOpen = localStorage.getItem(STORAGE_KEY_STATE) === 'true';
+        if (isOpen) {
+            chatBoxContent.style.display = 'flex';
+            chatToggleBtn.textContent = '❌';
+        } else {
+            chatBoxContent.style.display = 'none';
+            chatToggleBtn.textContent = '💬';
+        }
+
+        // Load lịch sử tin nhắn
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
+        history.forEach(msg => {
+            appendMessageToUI(msg.sender, msg.text, msg.type);
+        });
+
+        // -&#45;&#45; 2. CÁC SỰ KIỆN (EVENT LISTENERS) -&#45;&#45;
+
+        // Bật/Tắt chat
+        chatToggleBtn.addEventListener("click", () => {
+            const isHidden = chatBoxContent.style.display === 'none';
+            chatBoxContent.style.display = isHidden ? 'flex' : 'none';
+            chatToggleBtn.textContent = isHidden ? '❌' : '💬';
+
+            // Lưu trạng thái vào Storage
+            localStorage.setItem(STORAGE_KEY_STATE, isHidden);
+
+            if(isHidden) chatInput.focus();
+        });
+
+        // Xóa lịch sử
+        clearHistoryBtn.addEventListener("click", () => {
+            if(confirm("Bạn có chắc muốn xóa toàn bộ lịch sử chat?")) {
+                localStorage.removeItem(STORAGE_KEY_HISTORY);
+                chatMessages.innerHTML = ''; // Xóa giao diện
+            }
+        });
+
+        chatSend.addEventListener("click", sendMessage);
+        chatInput.addEventListener("keypress", e => { if(e.key === "Enter") sendMessage(); });
+
+        // -&#45;&#45; 3. HÀM XỬ LÝ CHÍNH -&#45;&#45;
+
+        function sendMessage() {
+            const msg = chatInput.value.trim();
+            if(!msg) return;
+
+            // 1. Hiển thị & Lưu tin nhắn User
+            appendMessageToUI("You", msg, 'user');
+            saveMessageToStorage("You", msg, 'user');
+
+            chatInput.value = "";
+
+            // 2. Hiển thị Typing (Không lưu cái này vào storage)
+            const typingIndicator = appendMessageToUI("Bot", "Đang trả lời...", 'typing');
+
+            // 3. Gọi API
+            fetch(CHAT_API_URL, {
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body: JSON.stringify({ message: msg })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // Xóa typing
+                if(typingIndicator && typingIndicator.parentNode) {
+                    chatMessages.removeChild(typingIndicator);
+                }
+
+                const replyText = data.reply || data.error;
+                const type = data.error ? "error" : "bot";
+
+                // 4. Hiển thị & Lưu tin nhắn Bot
+                appendMessageToUI(data.error ? "Error" : "Bot", replyText, type);
+                saveMessageToStorage(data.error ? "Error" : "Bot", replyText, type);
+            })
+            .catch(err => {
+                if(typingIndicator && typingIndicator.parentNode) {
+                    chatMessages.removeChild(typingIndicator);
+                }
+                appendMessageToUI("Error", "Lỗi kết nối server.", "error");
+            });
+        }
+
+        // Hàm chỉ để lưu vào LocalStorage
+        function saveMessageToStorage(sender, text, type) {
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
+            history.push({ sender: sender, text: text, type: type });
+            localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+        }
+
+        // Hàm chỉ để hiển thị ra màn hình (Render)
+        function appendMessageToUI(sender, text, type){
+            const div = document.createElement("div");
+
+            // CSS chung
+            div.style.maxWidth = "80%";
+            div.style.padding = "8px 12px";
+            div.style.borderRadius = "15px";
+            div.style.fontSize = "14px";
+            div.style.lineHeight = "1.5";
+            div.style.wordWrap = "break-word";
+            div.style.whiteSpace = "pre-wrap";
+            div.style.marginBottom = "5px";
+
+            if (type === 'user') {
+                div.style.alignSelf = "flex-end";
+                div.style.backgroundColor = "#e5e7eb";
+                div.style.color = "#1f2937";
+                div.style.borderBottomRightRadius = "2px";
+                div.innerHTML = `<strong>Bạn:</strong> ${text}`;
+            }
+            else if (type === 'bot') {
+                div.style.alignSelf = "flex-start";
+                div.style.backgroundColor = "#dcfce7"; // Xanh lá Pastel
+                div.style.color = "#14532d";
+                div.style.border = "1px solid #bbf7d0";
+                div.style.borderBottomLeftRadius = "2px";
+                div.innerHTML = `<strong>Bot:</strong> ${text}`;
+            }
+            else if (type === 'typing') {
+                div.style.alignSelf = "flex-start";
+                div.style.fontStyle = "italic";
+                div.style.color = "#888";
+                div.style.fontSize = "12px";
+                div.innerHTML = "⏳ <i>Đang trả lời...</i>";
+            }
+            else if (type === 'error') {
+                div.style.alignSelf = "center";
+                div.style.backgroundColor = "#fee2e2";
+                div.style.color = "#dc2626";
+                div.innerHTML = `⚠️ ${text}`;
+            }
+
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return div;
+        }
+    });
+</script>
+
+
+<script>
+    // --- KHAI BÁO BIẾN ---
+    // Sử dụng đúng key 'bookstoreCart' để đồng bộ số lượng giỏ hàng
+    let cart = JSON.parse(localStorage.getItem('bookstoreCart') || '[]');
+    let currentFilter = 'all';
+
+    // --- KHỞI TẠO ---
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount(); // Cập nhật số badge giỏ hàng ngay lập tức
+        renderVouchers();
+        startCountdowns();
+        animateOnScroll();
+    });
+
+    // --- HÀM CẬP NHẬT SỐ LƯỢNG TRÊN NAVBAR ---
+    function updateCartCount() {
+        const cartCount = document.getElementById('cartCount');
+        if (cartCount) {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+    }
+
+    // --- HÀM RENDER VOUCHERS ---
+    function renderVouchers() {
+        const grid = document.getElementById('voucherGrid');
+        if (!grid) return;
+
+        // Dữ liệu VOUCHERS_DATA lấy từ th:inline script bên trên
+        if (typeof VOUCHERS_DATA === 'undefined') {
+            // Fallback phòng khi dữ liệu chưa load
+            grid.innerHTML = '<div class="col-12 text-center p-5"><p class="text-muted">Đang tải dữ liệu...</p></div>';
+            return;
+        }
+
+        const filteredVouchers = currentFilter === 'all' ? VOUCHERS_DATA : VOUCHERS_DATA.filter(v => v.type === currentFilter);
+
+        if (filteredVouchers.length === 0) {
+            grid.innerHTML = '<div class="col-12 text-center p-5"><p class="text-muted">Không tìm thấy voucher phù hợp.</p></div>';
+            const totalEl = document.getElementById('totalVouchers');
+            if(totalEl) totalEl.textContent = 0;
+            return;
+        }
+
+        grid.innerHTML = filteredVouchers.map(voucher => `
+            <div class="voucher-card" data-type="${voucher.type}">
+                <div class="voucher-category">${voucher.category || 'Ưu đãi'}</div>
+                <div class="voucher-status status-${voucher.status}">
+                    ${voucher.status === 'active' ? 'Còn hiệu lực' :
+                      voucher.status === 'ending' ? 'Sắp hết hạn' : 'Hết hạn'}
+                </div>
+
+                <div class="voucher-header">
+                    <div class="voucher-discount">
+                        <div class="discount-value">${voucher.discountValue}</div>
+                        <div class="discount-type">${voucher.discountType}</div>
+                    </div>
+
+                    <div class="voucher-code">
+                        <div class="code-text">${voucher.code}</div>
+                        <button class="copy-btn" onclick="copyVoucherCode('${voucher.code}')">
+                            <i class="fas fa-copy"></i> Copy mã
+                        </button>
+                    </div>
+                </div>
+
+                <div class="voucher-info">
+                    <h4 class="voucher-title">${voucher.title}</h4>
+                    <p class="voucher-description">${voucher.description}</p>
+
+                    <div class="voucher-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar detail-icon"></i>
+                            <span class="detail-label">Hết hạn:</span>
+                            <span class="detail-value">${voucher.endDateDisplay}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-shopping-cart detail-icon"></i>
+                            <span class="detail-label">Đơn tối thiểu:</span>
+                            <span class="detail-value">${voucher.minOrderDisplay}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-ticket-alt detail-icon"></i>
+                            <span class="detail-label">Còn lại:</span>
+                            <span class="detail-value">${voucher.quantity} voucher</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-info-circle detail-icon"></i>
+                            <span class="detail-label">Điều kiện:</span>
+                            <span class="detail-value">${voucher.requirements}</span>
+                        </div>
+                    </div>
+
+                    ${voucher.status === 'ending' ? `
+                        <div class="countdown-timer" id="countdown-${voucher.id}">
+                            <div>⏰ Còn lại: <span class="timer-value" id="timer-${voucher.id}">--:--:--</span></div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        // Cập nhật tổng số voucher hiển thị
+        const totalEl = document.getElementById('totalVouchers');
+        if(totalEl) totalEl.textContent = filteredVouchers.length;
+    }
+
+    // --- HÀM LỌC VOUCHERS ---
+    function filterVouchers(event, type) {
+        currentFilter = type;
+
+        // Xử lý active button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        if(event && event.target) {
+             const btn = event.target.closest('.filter-btn');
+             if(btn) btn.classList.add('active');
+        }
+
+        renderVouchers();
+        startCountdowns();
+    }
+
+    // --- COPY CODE ---
+    function copyVoucherCode(code) {
+        if (!code) return;
+
+        // Sử dụng API Clipboard hiện đại trước
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification(`Đã copy mã voucher: ${code}`, 'success');
+            }).catch(() => {
+                fallbackCopyTextToClipboard(code);
+            });
+        } else {
+            fallbackCopyTextToClipboard(code);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";  // Để tránh scroll trang xuống cuối
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showNotification(`Đã copy mã voucher: ${text}`, 'success');
+            } else {
+                showNotification('Không thể copy mã', 'error');
+            }
+        } catch (err) {
+            showNotification('Lỗi copy', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+
+    // --- COUNTDOWN TIMERS ---
+    function startCountdowns() {
+        if (typeof VOUCHERS_DATA === 'undefined') return;
+        const endingVouchers = VOUCHERS_DATA.filter(v => v.status === 'ending');
+
+        endingVouchers.forEach(voucher => {
+            const timerElement = document.getElementById(`timer-${voucher.id}`);
+            if (timerElement) {
+                // Xóa interval cũ nếu có để tránh trùng lặp
+                const existingInterval = timerElement.dataset.intervalId;
+                if (existingInterval) clearInterval(parseInt(existingInterval));
+
+                updateCountdown(voucher.endDate, timerElement);
+                const intervalId = setInterval(() => updateCountdown(voucher.endDate, timerElement), 1000);
+                timerElement.dataset.intervalId = intervalId;
+            }
+        });
+    }
+
+    function updateCountdown(endDate, element) {
+        const now = new Date().getTime();
+        const end = new Date(endDate).getTime();
+        const distance = end - now;
+
+        if (distance > 0) {
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            element.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        } else {
+            element.textContent = 'Đã hết hạn';
+            if(element.dataset.intervalId) clearInterval(parseInt(element.dataset.intervalId));
+        }
+    }
+
+    // --- THÔNG BÁO ---
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        const alertClass = type === 'success' ? 'alert-success' :
+                          type === 'error' ? 'alert-danger' :
+                          type === 'info' ? 'alert-info' : 'alert-warning';
+
+        notification.className = `alert ${alertClass} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => notification.remove(), 500);
+            }
+        }, 3000);
+    }
+
+    // --- HIỆU ỨNG CUỘN & ANIMATION ---
+    function animateOnScroll() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target); // Chỉ animate 1 lần
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.voucher-card, .stats-section, .filter-section').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'all 0.6s ease';
+            observer.observe(element);
+        });
+    }
+
+    // Navbar effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 100) {
+            navbar.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%)';
+            navbar.style.backdropFilter = 'blur(10px)';
+        } else {
+            navbar.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            navbar.style.backdropFilter = 'none';
+        }
+
+        // Parallax Hero
+        const hero = document.querySelector('.hero-section');
+        if (hero) {
+            const scrolled = window.pageYOffset;
+            hero.style.transform = `translateY(${scrolled * -0.3}px)`; // Giảm tốc độ parallax cho mượt hơn
+        }
+    });
+</script>
+</body>
+</html>
